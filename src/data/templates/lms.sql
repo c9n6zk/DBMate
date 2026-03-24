@@ -1,0 +1,90 @@
+CREATE TABLE instructors (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  bio TEXT,
+  avatar_url VARCHAR(500),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE courses (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(200) NOT NULL,
+  description TEXT,
+  instructor_id INT NOT NULL,
+  category VARCHAR(100),
+  difficulty VARCHAR(20) NOT NULL DEFAULT 'beginner',
+  price DECIMAL(10,2) DEFAULT 0.00,
+  published BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (instructor_id) REFERENCES instructors(id) ON DELETE CASCADE
+);
+
+CREATE TABLE lessons (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  course_id INT NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  content TEXT,
+  video_url VARCHAR(500),
+  duration_minutes INT,
+  sort_order INT NOT NULL DEFAULT 0,
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+
+CREATE TABLE students (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  avatar_url VARCHAR(500),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE enrollments (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  student_id INT NOT NULL,
+  course_id INT NOT NULL,
+  enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  completed_at TIMESTAMP,
+  progress_percent INT NOT NULL DEFAULT 0,
+  FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+
+CREATE TABLE lesson_progress (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  enrollment_id INT NOT NULL,
+  lesson_id INT NOT NULL,
+  completed BOOLEAN NOT NULL DEFAULT FALSE,
+  completed_at TIMESTAMP,
+  FOREIGN KEY (enrollment_id) REFERENCES enrollments(id) ON DELETE CASCADE,
+  FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE
+);
+
+CREATE TABLE quizzes (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  lesson_id INT NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  passing_score INT NOT NULL DEFAULT 70,
+  FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE
+);
+
+CREATE TABLE quiz_questions (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  quiz_id INT NOT NULL,
+  question TEXT NOT NULL,
+  options TEXT NOT NULL,
+  correct_answer INT NOT NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
+);
+
+CREATE TABLE quiz_attempts (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  student_id INT NOT NULL,
+  quiz_id INT NOT NULL,
+  score INT NOT NULL,
+  passed BOOLEAN NOT NULL DEFAULT FALSE,
+  attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+  FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
+);

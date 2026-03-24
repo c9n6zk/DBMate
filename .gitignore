@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+
+# build
+dist/
+tsconfig.tsbuildinfo
+
+# environment
+.env
+.env.local
+.env.*.local
+
+# database
+data/*.sqlite
+data/*.sqlite-wal
+data/*.sqlite-shm
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# debug
+npm-debug.log*
+pnpm-debug.log*
+
+# playwright
+test-results/
+test-screenshots/
+.playwright-mcp/
+
+# misc
+*.tgz

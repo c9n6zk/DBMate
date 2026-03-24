@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find node_modules -name zod -type d -not -path */node_modules/*)",
+      "Bash(ls -la /c/MSC/1/prompt_engineering/DBMate/node_modules/@anthropic-ai/sdk/*.md)",
+      "Bash(curl -s http://localhost:3333 -o /dev/null -w \"%{http_code}\")",
+      "Bash(npx claude-code-proxy@latest)",
+      "Bash(pnpm dev:*)",
+      "Bash(curl -s http://localhost:42069/v1/messages -o /dev/null -w \"proxy: %{http_code}\")",
+      "Bash(curl -s http://localhost:3333 -o /dev/null -w \"nextjs: %{http_code}\")",
+      "Bash(curl -s http://localhost:3000 -o /dev/null -w \"%{http_code}\")",
+      "Bash(npx tsc:*)",
+      "Bash(node -e \":*)",
+      "Bash(node test-parser.mjs)",
+      "Bash(grep -r react-flow__controls-button c:MSC1prompt_engineeringDBMate --include=*.tsx --include=*.ts --include=*.jsx --include=*.js)",
+      "Bash(netstat -ano)",
+      "Bash(npx kill-port:*)",
+      "Bash(xargs grep:*)",
+      "Bash(xargs basename:*)",
+      "Bash(curl -s http://localhost:3333/api/schemas)",
+      "Bash(curl -s -X POST http://localhost:3333/api/schemas -H 'Content-Type: application/json' -d '{\"\"name\"\":\"\"Test Project\"\",\"\"dialect\"\":\"\"postgresql\"\"}')",
+      "Bash(curl -s http://localhost:3333/api/schemas/qtnk-rVy8-qkiR8Vx0SIS)",
+      "Bash(curl -s -X PATCH http://localhost:3333/api/schemas/qtnk-rVy8-qkiR8Vx0SIS -H 'Content-Type: application/json' -d '{\"\"name\"\":\"\"Renamed Project\"\"}')",
+      "Bash(curl -s -X DELETE http://localhost:3333/api/schemas/qtnk-rVy8-qkiR8Vx0SIS)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f''''Schema count: {len\\(d[\"\"schemas\"\"]\\)}''''\\)\")",
+      "Bash(curl -s -X POST http://localhost:3333/api/schemas -H 'Content-Type: application/json' -d '{\"\"\"\"name\"\"\"\":\"\"\"\"Test Phase 2\"\"\"\",\"\"\"\"dialect\"\"\"\":\"\"\"\"mysql\"\"\"\"}')",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f''''Created: {d[\"\"schema\"\"][\"\"id\"\"]} - {d[\"\"schema\"\"][\"\"name\"\"]}''''\\)\")",
+      "Bash(curl -s -X DELETE http://localhost:3333/api/schemas/viV1J_5c4J1OSvIQCLO5b)"
+    ],
+    "additionalDirectories": [
+      "c:\\MSC\\1\\prompt_engineering\\DBMate",
+      "c:\\MSC\\1\\prompt_engineering\\DBMate\\src\\app\\api\\schemas",
+      "c:\\MSC\\1\\prompt_engineering\\DBMate\\src\\app\\api\\schemas\\[id]\\versions"
+    ]
+  }
+}

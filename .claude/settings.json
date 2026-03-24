@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"http://localhost:3333/api/chat?schemaId=LqCV3Sorl4E2JJn0AbiJT\")",
+      "Bash(curl -s -X DELETE \"http://localhost:3333/api/chat?schemaId=LqCV3Sorl4E2JJn0AbiJT\")",
+      "Bash(curl -s -X PUT http://localhost:3333/api/settings -H \"Content-Type: application/json\" -d '{\"\"\"\"dialect\"\"\"\":\"\"\"\"mysql\"\"\"\",\"\"\"\"seedDefaultRows\"\"\"\":50,\"\"\"\"theme\"\"\"\":\"\"\"\"system\"\"\"\"}')",
+      "Bash(find c:/MSC/1/prompt_engineering/DBMate -name *.test.* -o -name *.spec.* -o -name test-* -o -name tests -type d)",
+      "Bash(curl -s http://localhost:3333/api/health)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\admin\\AppData\\Local\\ms-playwright\\mcp-chrome-0b56aa0",
+      "c:\\MSC\\1\\prompt_engineering\\DBMate\\docs"
+    ]
+  }
+}

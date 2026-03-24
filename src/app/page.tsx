@@ -1,65 +1,98 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState } from 'react';
+import {
+  Database,
+  Plus,
+  ClipboardPaste,
+  FileUp,
+  LayoutTemplate,
+} from 'lucide-react';
+import { NewProjectWizard } from '@/components/shared/new-project-wizard';
+import { PageTransition } from '@/components/shared/motion';
+
+type ImportMethod = 'empty' | 'paste' | 'upload' | 'template';
+
+const ACTIONS: {
+  method?: ImportMethod;
+  label: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+}[] = [
+  {
+    label: 'New Project',
+    description: 'Create a project from scratch or import SQL',
+    icon: Plus,
+  },
+  {
+    method: 'paste',
+    label: 'Paste SQL',
+    description: 'Paste your CREATE TABLE statements',
+    icon: ClipboardPaste,
+  },
+  {
+    method: 'upload',
+    label: 'Upload File',
+    description: 'Import a .sql or .txt file',
+    icon: FileUp,
+  },
+  {
+    method: 'template',
+    label: 'From Template',
+    description: 'Start from a pre-built schema',
+    icon: LayoutTemplate,
+  },
+];
+
+export default function ImportPage() {
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [initialMethod, setInitialMethod] = useState<
+    ImportMethod | undefined
+  >();
+
+  const openWizard = (method?: ImportMethod) => {
+    setInitialMethod(method);
+    setWizardOpen(true);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <PageTransition>
+      <div className="flex flex-col items-center justify-center gap-6 sm:gap-8 max-w-2xl mx-auto min-h-[60vh] px-2 sm:px-0">
+        {/* Hero */}
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Database className="h-10 w-10 text-primary" />
+          <h1 className="text-2xl font-bold tracking-tight">
+            Welcome to DBMate
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-sm text-muted-foreground max-w-md">
+            Design, optimize, and manage your database schemas.
+            Create a new project or import an existing SQL schema to get started.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Action cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
+          {ACTIONS.map((action) => (
+            <button
+              key={action.label}
+              onClick={() => openWizard(action.method)}
+              className="flex flex-col items-center gap-2 sm:gap-2.5 p-3 sm:p-5 rounded-lg border border-border transition-all text-center hover:border-primary/50 hover:bg-primary/5 hover:shadow-sm"
+            >
+              <action.icon className="h-7 w-7 text-primary" />
+              <span className="text-sm font-medium">{action.label}</span>
+              <span className="text-[11px] text-muted-foreground leading-tight">
+                {action.description}
+              </span>
+            </button>
+          ))}
         </div>
-      </main>
-    </div>
+      </div>
+
+      <NewProjectWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        initialMethod={initialMethod}
+      />
+    </PageTransition>
   );
 }

@@ -1,0 +1,61 @@
+CREATE TABLE users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  display_name VARCHAR(100),
+  bio TEXT,
+  avatar_url VARCHAR(500),
+  role VARCHAR(20) NOT NULL DEFAULT 'author',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE categories (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  slug VARCHAR(100) NOT NULL UNIQUE,
+  description TEXT
+);
+
+CREATE TABLE posts (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(300) NOT NULL,
+  slug VARCHAR(300) NOT NULL UNIQUE,
+  content TEXT NOT NULL,
+  excerpt TEXT,
+  author_id INT NOT NULL,
+  category_id INT,
+  status VARCHAR(20) NOT NULL DEFAULT 'draft',
+  published_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+);
+
+CREATE TABLE tags (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(50) NOT NULL UNIQUE,
+  slug VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE post_tags (
+  post_id INT NOT NULL,
+  tag_id INT NOT NULL,
+  PRIMARY KEY (post_id, tag_id),
+  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+  FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+);
+
+CREATE TABLE comments (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  post_id INT NOT NULL,
+  user_id INT,
+  author_name VARCHAR(100),
+  content TEXT NOT NULL,
+  parent_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE
+);
