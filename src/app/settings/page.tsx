@@ -8,10 +8,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useSettingsStore } from '@/stores/settings-store';
 import type { Dialect, MigrationFormat } from '@/lib/types';
 import { PageTransition } from '@/components/shared/motion';
+import { useEffect, useState } from 'react';
 
 export default function SettingsPage() {
-  const { settings, updateSettings } = useSettingsStore();
+  const { settings: _settings, updateSettings } = useSettingsStore();
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  // Use defaults until hydrated to prevent SSR mismatch
+  const settings = mounted ? _settings : {
+    dialect: 'mysql' as const,
+    migrationFormat: 'raw' as const,
+    language: 'hu' as const,
+    aiModel: 'claude-sonnet-4-6',
+    temperature: 0.1,
+    maxTokens: 4096,
+  };
 
   return (
     <PageTransition>
@@ -30,7 +44,7 @@ export default function SettingsPage() {
           <div className="grid gap-2">
             <Label htmlFor="theme">Theme</Label>
             <Select
-              value={theme ?? 'system'}
+              value={mounted ? (theme ?? 'system') : 'system'}
               onValueChange={(v) => { if (v) setTheme(v); }}
             >
               <SelectTrigger id="theme">
