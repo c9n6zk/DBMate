@@ -58,14 +58,17 @@ pnpm install
 Hozz létre egy `.env.local` fájlt a projekt gyökerében:
 
 ```env
-# Anthropic API kulcs (kötelező)
+# 1. opció: Anthropic API kulcs (ha van)
 ANTHROPIC_API_KEY=sk-ant-...ide-ird-a-kulcsod...
+
+# 2. opció: Claude Max proxy (ha nincs API kulcs, de van Claude Max előfizetés)
+# ANTHROPIC_BASE_URL=http://localhost:42069
 
 # AI modell (opcionális, alapértelmezett: claude-sonnet-4-6)
 AI_MODEL=claude-sonnet-4-6
 ```
 
-> **Megjegyzés:** API kulcs nélkül az alkalmazás elindul, de az AI funkciók (chat, analyze, migrate, seed, explain) nem működnek. A statikus funkciók (import, ER diagram, export) kulcs nélkül is használhatóak.
+> **Megjegyzés:** Az AI funkciókhoz (chat, analyze, migrate, seed, explain) szükség van vagy Anthropic API kulcsra, vagy a Claude Max proxy-ra. A statikus funkciók (import, ER diagram, export) ezek nélkül is használhatóak. A fejlesztés során Claude Max előfizetést használtunk egy saját OAuth proxy-n keresztül, mert nem rendelkeztünk API kulccsal.
 
 ### 4. Fejlesztői szerver indítása
 

@@ -24,7 +24,21 @@ A fejlesztési folyamat három fő lépésre tagolódott:
 
 3. **AI Improvement Plan** — Egy önálló review ciklus, ahol az AI saját kódját elemezte és 35 javítási pontot azonosított (v6-ig iterálva). Ezek közül a kritikusakat implementáltuk: centralizált JSON parsing (`extractJSON`), retry+Zod validáció, few-shot prompting, hibrid statikus+AI elemzés.
 
-A legérdekesebb kihívás a **proxy limitáció** volt: a Claude Max előfizetéshez használt OAuth proxy nem támogatja a `tool_use` API-t, ezért egy kettős stratégiát kellett kidolgozni — proxy módban szöveges válaszból JSON-t parseolunk (`extractJSON` + Zod), közvetlen API módban pedig natív tool_use-t használunk. A mód automatikus detekciója az `isProxyMode()` függvénnyel történik.
+### API elérés: Claude Max proxy vs. API kulcs
+
+A fejlesztés során **nem rendelkeztünk Anthropic API kulccsal** — ehelyett a **Claude Max előfizetés** (claude.ai webes felület) által biztosított tokent használtuk. Ehhez egy saját **OAuth proxy szervert** fejlesztettünk (Node.js, külön repository: `claude-code-proxy`), amely a claude.ai session tokent felhasználva közvetíti az API hívásokat a lokális Next.js szerver felé.
+
+Ez komoly kihívást jelentett, mert a proxy **nem támogatja az Anthropic `tool_use` API-t** (structured output) — csak szöveges (`text`) válaszokat tud visszaadni. Így az AI válaszokból saját JSON-parserrel kellett kinyerni a strukturált adatot.
+
+Ennek megoldására **kettős stratégiát** dolgoztunk ki:
+- **Proxy mód** (Claude Max) — Az AI szöveges válaszából a `extractJSON()` függvény robusztusan kinyeri a JSON-t (markdown code block kezelés, csonkolt JSON javítás, brace-balancing), majd Zod sémával validáljuk.
+- **Közvetlen API mód** (Anthropic API kulcs) — Ha a felhasználónak van API kulcsa, a natív `tool_use` API-t használjuk structured output-tal.
+
+A mód automatikus detekciója az `isProxyMode()` függvénnyel történik (ellenőrzi, hogy az `ANTHROPIC_BASE_URL` környezeti változó be van-e állítva).
+
+**Az alkalmazás tehát mindkét módon működik:**
+- `.env.local`-ban `ANTHROPIC_API_KEY=sk-ant-...` → közvetlen API mód
+- `.env.local`-ban `ANTHROPIC_BASE_URL=http://localhost:42069` → proxy mód (Claude Max előfizetéssel)
 
 ## 3. Technológiai stack
 
@@ -152,7 +166,7 @@ Felhasználói beállítások: téma (dark/light/system), alapértelmezett diale
 
 ### 5.2. Ami nehéz volt / tanulságok
 
-- **Proxy limitáció megkerülése** — A Claude Max OAuth proxy nem támogatja a `tool_use` API-t. A megoldás: egy `extractJSON()` függvény, amely robusztusan kezel markdown code block-okat, csonkolt JSON-t, és brace-balancing-gel javítja a hibás válaszokat. Tanulság: az LLM output mindig „piszkos" — érdemes defensíven parseolni.
+- **Proxy limitáció megkerülése** — Lásd a 2. fejezet részletes leírását. A legfontosabb tanulság: az LLM output mindig „piszkos" — érdemes defensíven parseolni. Az `extractJSON()` függvény (~80 sor) megbízhatóbban működik, mint bármilyen regex-alapú megoldás, mert brace-balancing-gel és csonkolt JSON javítással dolgozik.
 
 - **Kontextus ablak menedzselés** — A legnagyobb kihívás az volt, hogy a Master Plan + az aktuális kód + a prompt együtt ne lépje túl a kontextus limitet. Megoldás: fázisonkénti prompt-ok, amelyek csak a releváns részt tartalmazzák, és a séma JSON kompakt formátumban (oszlopnév + típus, FK-k nélkül a részletek).
 
