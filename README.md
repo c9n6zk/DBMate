@@ -78,7 +78,29 @@ pnpm dev
 
 Az alkalmazás elérhető: **http://localhost:3000**
 
-### 5. Production build
+### 5. Tesztek futtatása
+
+```bash
+# Unit tesztek (Vitest)
+pnpm test
+
+# Unit tesztek watch módban
+pnpm test:watch
+
+# Coverage riport
+pnpm test:coverage
+
+# E2E tesztek (Playwright — dev server futása szükséges)
+pnpm test:e2e
+```
+
+| Típus | Keretrendszer | Fájlok | Tesztek |
+|---|---|---|---|
+| Unit | Vitest + Testing Library | 48 | 535 |
+| E2E | Playwright | 12 | 70 |
+| A11y | axe-core (WCAG 2 AA) | 1 | 7 |
+
+### 6. Production build
 
 ```bash
 pnpm build

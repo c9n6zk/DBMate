@@ -230,7 +230,45 @@ Tapasztalat: a Claude Code kiemelkedően hatékony volt a fázisonkénti fejlesz
 
 - **Zustand állapotkezelés** — 3 store (schema, chat, settings) a persist middleware-rel, localStorage-ba mentve. Ez lehetővé teszi, hogy a felhasználó böngésző-frissítés után is a korábbi állapotban folytassa.
 
-## 6. Összefoglaló
+## 6. Tesztelés
+
+A projekt átfogó tesztelésen esett át, három szinten:
+
+### 6.1. Unit tesztek (Vitest)
+
+48 tesztfájl, **535 teszt**, amely lefedi:
+
+- **Lib/service modulok** (98% lefedettség) — `extractJSON`, `ai-retry`, `sql-parser`, `static-analyzer`, `validations`, `rate-limiter`, `migration-templates`, `seed-utils`, `seed-validator`, `doc-generator`, `api-helpers`, `apply-fix`, `batch-fix`, `db`
+- **Zustand store-ok** (3/3) — `schema-store`, `chat-store`, `settings-store`
+- **React komponensek** (21 fájl) — `ai-chat`, `sidebar`, `new-project-wizard`, `table-details`, `explain-plan`, `health-score-gauge`, `issue-card`, `migration-list`, `template-gallery`, `error-boundary`, stb.
+
+```bash
+pnpm test            # egyszer futtat
+pnpm test:coverage   # lefedettség riporttal
+```
+
+### 6.2. E2E tesztek (Playwright)
+
+12 tesztfájl, **70 teszt**, amely az alkalmazás teljes felhasználói folyamatait teszteli:
+
+- **API route-ok** — `/api/health`, `/api/parse`, `/api/analyze`, `/api/schemas`, `/api/settings`, `/api/chat`
+- **Felhasználói flow-k** — import flow (template → parse → dashboard), sidebar navigáció, dashboard ER diagram, optimizer elemzés, migrations generálás, export letöltés, settings mentés, chat küldés, séma verziók
+- **Akadálymentesség (a11y)** — axe-core WCAG 2 AA szabvány ellenőrzés minden fő oldalon
+
+```bash
+pnpm test:e2e        # Playwright futtatás
+```
+
+### 6.3. Teszt összefoglaló
+
+| Típus | Keretrendszer | Fájlok | Tesztek |
+|---|---|---|---|
+| Unit | Vitest + Testing Library | 48 | 535 |
+| E2E | Playwright | 12 | 70 |
+| A11y | axe-core (WCAG 2 AA) | 1 | 7 |
+| **Összesen** | | **61** | **605** |
+
+## 7. Összefoglaló
 
 | Metrika | Érték |
 |---|---|
@@ -243,5 +281,6 @@ Tapasztalat: a Claude Code kiemelkedően hatékony volt a fázisonkénti fejlesz
 | API route-ok | 15 (1 612 sor) |
 | Zustand store-ok | 3 (723 sor) |
 | AI funkciók | 6 (chat, analyze, migrate, seed, explain, index-analysis) |
+| Tesztek | 605 (535 unit + 70 E2E) |
 | Build status | Sikeres (0 hiba) |
 | Screenshot-ok | 19 (dark + light mode) |
