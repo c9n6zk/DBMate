@@ -231,10 +231,14 @@ Tapasztalat: a Claude Code kiemelkedően hatékony volt a fázisonkénti fejlesz
 
 | Metrika | Érték |
 |---|---|
-| Forrásfájlok | ~100 TypeScript/TSX |
+| Összes kódsor | **14 505** TypeScript/TSX |
+| Forrásfájlok | ~100 |
 | API végpontok | 15 |
-| UI komponensek | 60+ |
-| Oldalak/route-ok | 7 + error/loading |
+| UI komponensek | 60+ (6 972 sor) |
+| Lib/service modulok | 20 (2 822 sor) |
+| Oldalak/route-ok | 7 + error/loading (2 376 sor) |
+| API route-ok | 15 (1 612 sor) |
+| Zustand store-ok | 3 (723 sor) |
 | AI funkciók | 6 (chat, analyze, migrate, seed, explain, index-analysis) |
 | Build status | Sikeres (0 hiba) |
 | Screenshot-ok | 18 |
