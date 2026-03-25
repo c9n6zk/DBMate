@@ -309,4 +309,4 @@ Ezzel szemben a **lib modulok 97.87%-os lefedettséget** értek el, mert ezek az
 | Lib coverage | **97.87%** lines |
 | Összesített coverage | 60.59% lines |
 | Build status | Sikeres (0 hiba) |
-| Screenshot-ok | 21 |
+
