@@ -154,29 +154,74 @@ Felhasználói beállítások: téma (dark/light/system), alapértelmezett diale
 
 ## 5. Prompt Engineering technikák és tanulságok
 
-### 5.1. Ami jól működött
+### 5.1. System prompt tervezési mintázatok
 
-- **Master Plan mint kontextus** — Egy ~2800 soros terv dokumentum, amelyre minden prompt hivatkozott. Ez biztosította, hogy az AI konzisztens architektúrát és API-t generáljon fázisokon átívelően. Ez volt a legfontosabb döntés: a „kontextus ablak gondos kezelése" exponenciálisan javította a kód minőségét.
+Az alkalmazás 6 különálló AI endpointot használ, mindegyikhez dedikált system prompt tartozik (`src/lib/ai-prompts.ts`). A prompt-ok tervezése során a következő mintázatokat alkalmaztuk:
 
-- **Few-shot prompting az AI válaszokhoz** — Az AI service minden endpoint-jához (chat, analyze, migrate, seed, explain) dedikált few-shot példákat definiáltunk (`src/lib/ai-prompts.ts`), amelyek a várt JSON-struktúrát mutatják be. Ez drámaian csökkentette a parse hibákat.
+**Persona + Scope constraint** — Minden prompt egy szűk szakértői szerepet definiál, és expliciten korlátozza az elemzési területet. Például a normalizációs prompt: *„Analyze ONLY normalization quality. Do NOT check performance, security, or naming."* Ez azért fontos, mert az AI hajlamos „túlszolgálni" — ha nem korlátozzuk, a normalizációs elemzés performance tanácsokat is ad, ami összekeveri a kategóriákat.
 
-- **Retry + Zod validáció** — Automatikus újrapróbálkozás sémával: ha az AI válasz nem felel meg a Zod sémának, növelt temperature-rel újrageneráljuk, a hibát kontextusba injektálva (`[RETRY: Your previous response had errors: ...]`). Ez a megközelítés ~95%-os sikerességi rátát ért el.
+**Output format kikényszerítés** — Minden prompt tartalmazza: *„Return ONLY a JSON object (no markdown, no code blocks)"*. Ez drámaian csökkentette a parse hibákat. A seed prompt esetében más a minta: *„Return ONLY raw SQL INSERT statements"* — mert ott nem JSON-t, hanem SQL-t várunk.
 
-- **Hibrid statikus + AI elemzés** — Az optimizer nem kizárólag AI-ra támaszkodik: a statikus elemző (`src/lib/static-analyzer.ts`) azonnal felismeri a hiányzó indexeket, audit oszlopokat, naming convention sértéseket — míg a komplexebb normalizációs analízist az AI végzi. Ez gyorsabb és megbízhatóbb, mint ha mindent az AI-ra bíznánk.
+**Negatív instrukciók** — A chat prompt tartalmazza: *„NEVER invent tables/columns not in the schema"* és *„Admit uncertainty rather than hallucinate"*. Ezek a negatív utasítások hatékonyabbnak bizonyultak, mint a pozitív megfogalmazások („Only use existing tables").
 
-### 5.2. Ami nehéz volt / tanulságok
+**Kontextus tömörítés** — A séma kontextust kompakt formátumban adjuk át az AI-nak (`buildSchemaContext()` függvény), nem a teljes CREATE TABLE SQL-t. Például: `TABLE orders: - id INT [PK, AUTO] - customer_id INT [NOT NULL] FK: customer_id -> customers(id) ON DELETE CASCADE`. Ez ~60%-kal kevesebb tokent használ, mint a nyers SQL.
+
+### 5.2. Few-shot prompting
+
+Minden AI végponthoz (normalization, migration, explain, seed) dedikált few-shot példákat definiáltunk — egy user-assistant üzenetpárt, amely pontosan a várt struktúrát mutatja be.
+
+Példa a seed few-shot-ra (magyar locale):
+```
+User: "Schema: users(id INT PK AUTO, name VARCHAR(50)...) Config: 3 rows, locale: hu"
+Assistant: "INSERT INTO users (id, name, email, status) VALUES
+(1, 'Kovacs Istvan', 'kovacs.istvan@example.hu', 'active'),
+(2, 'Nagy Katalin', 'nagy.katalin@example.hu', 'active'),
+(3, 'Toth Peter', 'toth.peter@example.hu', 'inactive');"
+```
+
+A few-shot példák hatása mérhető volt: nélkülük az AI ~30%-ban rossz JSON-struktúrát adott vissza (pl. `up_sql` a várt `upSQL` helyett). A few-shot után ez ~5%-ra csökkent, a maradék hibákat a retry mechanizmus kezeli.
+
+### 5.3. Retry + validáció stratégia
+
+Az `withRetry()` függvény (`src/lib/ai-retry.ts`) egy általános retry wrapper, amely Zod sémával validálja az AI outputot:
+
+1. **Hívás** → AI válasz → `extractJSON()` → Zod parse
+2. **Ha sikertelen** → a Zod hibaüzenetet visszainjektáljuk a következő promptba: `[RETRY: Your previous response had errors: JSON validation failed: ...]`
+3. **Temperature csökkentés** — minden retry-nál 0.05-tel csökken (pl. 0.1 → 0.05 → 0.0), hogy az AI determinisztikusabb legyen
+
+Ez a „self-correcting" minta a legmegbízhatóbb módszer volt: az AI tipikusan a 2. próbálkozásra javítja a hibát, mert látja a konkrét Zod hibaüzenetet. Maximum 3 próbálkozás (1 + 2 retry) történik.
+
+Érdekesség: a `normalizeKeys()` logika a migrate endpointban — az AI néha `up_sql`-t ad `upSQL` helyett, ezért explicit key-mapping-et alkalmazunk a validáció előtt.
+
+### 5.4. Claude Code CLI mint fejlesztési eszköz
+
+A teljes projekt **Claude Code** (Anthropic CLI) segítségével készült — nem webes Claude-dal, hanem a terminálból futtatott agenssel, amely közvetlenül szerkeszti a fájlokat, futtat parancsokat, és olvassa a kódot.
+
+A fejlesztési workflow:
+1. **Master Plan** megírása egy hosszú prompt-ban → ez adta az architektúrát
+2. **Fázisonkénti implementáció** — minden fázishoz egy-egy konverzáció, pl. *„Implementáld a Phase 3-at a Master Plan alapján"*
+3. **Review ciklus** — *„Nézd át az AI-hoz kapcsolódó route-okat és azonosítsd a javítási lehetőségeket"* → ez generálta az AI Improvement Plan-t (35 javítási pont, v6-ig iterálva)
+4. **Iteratív javítás** — a review eredményei alapján újabb konverzációkban implementáltuk a javításokat
+
+Tapasztalat: a Claude Code kiemelkedően hatékony volt a fázisonkénti fejlesztésre, mert a konverzáción belül megtartotta a kontextust. Viszont konverzációk között elveszett a kontextus — erre megoldás volt a Master Plan és az AI Improvement Plan, amelyek állandó referenciát biztosítottak.
+
+### 5.5. Ami nehéz volt / kihívások
 
 - **Proxy limitáció megkerülése** — Lásd a 2. fejezet részletes leírását. A legfontosabb tanulság: az LLM output mindig „piszkos" — érdemes defensíven parseolni. Az `extractJSON()` függvény (~80 sor) megbízhatóbban működik, mint bármilyen regex-alapú megoldás, mert brace-balancing-gel és csonkolt JSON javítással dolgozik.
 
-- **Kontextus ablak menedzselés** — A legnagyobb kihívás az volt, hogy a Master Plan + az aktuális kód + a prompt együtt ne lépje túl a kontextus limitet. Megoldás: fázisonkénti prompt-ok, amelyek csak a releváns részt tartalmazzák, és a séma JSON kompakt formátumban (oszlopnév + típus, FK-k nélkül a részletek).
+- **Kontextus ablak menedzselés** — A legnagyobb kihívás az volt, hogy a Master Plan + az aktuális kód + a prompt együtt ne lépje túl a kontextus limitet. Megoldás: fázisonkénti prompt-ok, amelyek csak a releváns részt tartalmazzák, és a séma JSON kompakt formátumban.
 
-- **AI „hallucinálás" kezelése** — Az AI időnként nem létező oszlopnevekre vagy függvényekre hivatkozott. A Zod validáció + retry mechanizmus ezt kezeli: ha a válasz nem valid, a hiba üzenetet visszaadjuk az AI-nak, amely tipikusan a második próbálkozásra javít.
+- **AI „hallucinálás" kezelése** — Az AI időnként nem létező oszlopnevekre vagy függvényekre hivatkozott. A Zod validáció + retry mechanizmus ezt kezeli: ha a válasz nem valid, a hibaüzenetet visszaadjuk az AI-nak, amely tipikusan a második próbálkozásra javít.
 
-- **Lokalizáció** — A magyar nyelvű válaszok generálása külön system prompt instrukciókat igényelt. Érdekes tanulság, hogy az AI hajlamos visszaváltani angolra, ha a séma angol — a system prompt-ban explicit „Válaszolj magyarul" utasítás kellett.
+- **Lokalizáció** — A magyar nyelvű válaszok generálása külön system prompt instrukciókat igényelt. Az AI hajlamos visszaváltani angolra, ha a séma angol neveket használ — a system prompt-ban explicit „Válaszolj magyarul" utasítás kellett, valamint a few-shot példában magyar neveket adtunk (pl. „Kovacs Istvan").
 
-### 5.3. Architektúra döntések
+- **SSR hydration mismatch** — A Zustand persist middleware localStorage-ból tölt, ami eltér a szerveren renderelt alapértelmezéstől. Megoldás: `mounted` state pattern — a komponens először az alapértelmezett értékeket rendereli, és csak a kliens-oldali `useEffect` után váltja be a valós értékeket.
+
+### 5.6. Architektúra döntések
 
 - **Next.js API Routes az LLM proxy-ként** — A szerver oldali API route-ok kezelik az AI hívásokat, így az API kulcs nem kerül a kliensre. A streaming SSE-vel a chat válaszok real-time jelennek meg.
+
+- **Hibrid statikus + AI elemzés** — Az optimizer nem kizárólag AI-ra támaszkodik: a statikus elemző (`src/lib/static-analyzer.ts`) azonnal felismeri a hiányzó indexeket, audit oszlopokat, naming convention sértéseket — míg a komplexebb normalizációs analízist az AI végzi. Ez gyorsabb és megbízhatóbb, mint ha mindent az AI-ra bíznánk.
 
 - **SQLite mint lokális adatbázis** — Egyetlen fájl, nincs külső függőség, WAL mód a párhuzamos olvasáshoz. A sémák, verziók, migrációk, chat history mind itt tárolódnak.
 
