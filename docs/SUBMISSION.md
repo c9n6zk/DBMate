@@ -259,7 +259,15 @@ pnpm test:coverage   # lefedettség riporttal
 pnpm test:e2e        # Playwright futtatás
 ```
 
-### 6.3. Teszt összefoglaló
+### 6.3. Coverage riport
+
+![Coverage összesítés](screenshots/20-test-coverage.png)
+*Coverage összesítés — lib 97%, components 5-67%, összesen 60.59% sorlefedettség*
+
+![Lib coverage részletek](screenshots/21-test-coverage-lib.png)
+*Lib modulok részletes lefedettség — 16 fájlból 12 darab 100% statement coverage*
+
+### 6.4. Teszt összefoglaló
 
 | Típus | Keretrendszer | Fájlok | Tesztek |
 |---|---|---|---|
@@ -267,6 +275,11 @@ pnpm test:e2e        # Playwright futtatás
 | E2E | Playwright | 12 | 70 |
 | A11y | axe-core (WCAG 2 AA) | 1 | 7 |
 | **Összesen** | | **61** | **605** |
+
+| Coverage | Statements | Branches | Functions | Lines |
+|---|---|---|---|---|
+| **Lib modulok** | 96.93% | 85.59% | 98.44% | **97.87%** |
+| **Összesen** | 60.17% | 56.59% | 54.16% | **60.59%** |
 
 ## 7. Összefoglaló
 
@@ -282,5 +295,6 @@ pnpm test:e2e        # Playwright futtatás
 | Zustand store-ok | 3 (723 sor) |
 | AI funkciók | 6 (chat, analyze, migrate, seed, explain, index-analysis) |
 | Tesztek | 605 (535 unit + 70 E2E) |
+| Lib coverage | 97.87% lines |
 | Build status | Sikeres (0 hiba) |
-| Screenshot-ok | 19 (dark + light mode) |
+| Screenshot-ok | 21 (dark + light mode + coverage) |
