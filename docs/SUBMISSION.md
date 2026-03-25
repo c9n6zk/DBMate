@@ -55,6 +55,10 @@ A mód automatikus detekciója az `isProxyMode()` függvénnyel történik (elle
 | @xyflow/react | 12.10 | ER diagram vizualizáció |
 | CodeMirror 6 | 6.0 | SQL szerkesztő |
 | node-sql-parser | 5.4 | SQL elemzés |
+| Vitest | 4.1 | Unit teszt keretrendszer |
+| Testing Library | 16.3 | React komponens tesztelés |
+| Playwright | 1.52 | E2E tesztelés |
+| axe-core | 4.10 | Akadálymentességi (a11y) tesztek |
 
 ## 4. Funkciók és screenshotok
 
@@ -267,6 +271,16 @@ pnpm test:e2e        # Playwright futtatás
 ![Lib coverage részletek](screenshots/21-test-coverage-lib.png)
 *Lib modulok részletes lefedettség — 16 fájlból 12 darab 100% statement coverage*
 
+**Miért alacsony egyes komponensek lefedettsége?**
+
+Az alacsony coverage-ű komponensek (pl. `components/dashboard` 5.92%, `components/import` 13.23%) tudatos döntés eredménye. Ezek komplex, interaktív UI elemek (ER diagram a `@xyflow/react`-tel, CodeMirror SQL szerkesztő, drag & drop), amelyeknél:
+
+- A unit tesztelés ROI nagyon alacsony — a renderelés külső könyvtárak belső állapotától függ (canvas, virtualizált DOM)
+- Az ER diagram (`er-diagram.tsx`, 261 sor) egy `@xyflow/react` wrapper, amelynek a belső layout algoritmusát nem érdemes unit tesztelni
+- Ezeket az **E2E tesztek** fedik le hatékonyabban (Playwright böngészőben teszteli a teljes flow-t: import → dashboard megjelenés → tábla kattintás)
+
+Ezzel szemben a **lib modulok 97.87%-os lefedettséget** értek el, mert ezek az üzleti logikát tartalmazzák (SQL parsing, AI válasz feldolgozás, validáció, statikus elemzés) — itt a legmagasabb a hibakockázat, és a unit tesztelés a leghatékonyabb.
+
 ### 6.4. Teszt összefoglaló
 
 | Típus | Keretrendszer | Fájlok | Tesztek |
@@ -285,16 +299,14 @@ pnpm test:e2e        # Playwright futtatás
 
 | Metrika | Érték |
 |---|---|
-| Összes kódsor | **14 505** TypeScript/TSX |
-| Forrásfájlok | ~100 |
+| Összes kódsor | **20 556** TypeScript/TSX |
+| Alkalmazás kód | 13 555 sor (~100 fájl) |
+| Teszt kód | 7 001 sor (60 fájl) |
 | API végpontok | 15 |
-| UI komponensek | 60+ (6 972 sor) |
-| Lib/service modulok | 20 (2 822 sor) |
-| Oldalak/route-ok | 7 + error/loading (2 376 sor) |
-| API route-ok | 15 (1 612 sor) |
-| Zustand store-ok | 3 (723 sor) |
+| UI komponensek | 60+ |
 | AI funkciók | 6 (chat, analyze, migrate, seed, explain, index-analysis) |
-| Tesztek | 605 (535 unit + 70 E2E) |
-| Lib coverage | 97.87% lines |
+| Tesztek | **605** (535 unit + 70 E2E) |
+| Lib coverage | **97.87%** lines |
+| Összesített coverage | 60.59% lines |
 | Build status | Sikeres (0 hiba) |
-| Screenshot-ok | 21 (dark + light mode + coverage) |
+| Screenshot-ok | 21 |
