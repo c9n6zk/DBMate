@@ -151,7 +151,7 @@ Többféle export formátum: Schema SQL, Migrations ZIP, Seed Data, ER Diagram P
 
 ### 4.10. Settings
 
-Felhasználói beállítások: téma (dark/light/system), alapértelmezett dialektus, migrációs formátum, nyelv, AI konfiguráció. Az alkalmazás teljes dark és light módot támogat, amely a Settings oldalon váltható.
+Felhasználói beállítások: téma (dark/light/system), alapértelmezett dialektus, migrációs formátum, nyelv, AI konfiguráció. Az alkalmazás teljes dark és light módot támogatja, amely a Settings oldalon váltható.
 
 ![Settings](screenshots/18-settings.png)
 *Settings — Appearance, Database Defaults, AI Configuration*
@@ -207,7 +207,7 @@ A teljes projekt **Claude Code** (Anthropic CLI) segítségével készült — n
 A fejlesztési workflow:
 1. **Master Plan** megírása egy hosszú prompt-ban → ez adta az architektúrát
 2. **Fázisonkénti implementáció** — minden fázishoz egy-egy konverzáció, pl. *„Implementáld a Phase 3-at a Master Plan alapján"*
-3. **Review ciklus** — *„Nézd át az AI-hoz kapcsolódó route-okat és azonosítsd a javítási lehetőségeket"* → ez generálta az AI Improvement Plan-t (35 javítási pont, v6-ig iterálva)
+3. **Review ciklus** — *„Nézd át az AI-hoz kapcsolódó route-okat és azonosítsd a javítási lehetőségeket"* → ez generálta az AI Improvement Plan-t (52 javítási pont, v6-ig iterálva)
 4. **Iteratív javítás** — a review eredményei alapján újabb konverzációkban implementáltuk a javításokat
 
 Tapasztalat: a Claude Code kiemelkedően hatékony volt a fázisonkénti fejlesztésre, mert a konverzáción belül megtartotta a kontextust. Viszont konverzációk között elveszett a kontextus — erre megoldás volt a Master Plan és az AI Improvement Plan, amelyek állandó referenciát biztosítottak.
