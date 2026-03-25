@@ -163,20 +163,22 @@ export default function SeedPage() {
         </div>
 
         {/* Generate button */}
-        <Button
-          onClick={handleGenerate}
-          disabled={isGenerating || enabledTables.length === 0}
-          className="w-full max-w-md mx-auto"
-        >
-          {isGenerating ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Sprout className="h-4 w-4 mr-2" />
-          )}
-          {isGenerating
-            ? 'Generating...'
-            : `Generate Seed Data (${enabledTables.length} table${enabledTables.length !== 1 ? 's' : ''})`}
-        </Button>
+        <div className="flex justify-center">
+          <Button
+            onClick={handleGenerate}
+            disabled={isGenerating || enabledTables.length === 0}
+            className="w-full max-w-md"
+          >
+            {isGenerating ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Sprout className="h-4 w-4 mr-2" />
+            )}
+            {isGenerating
+              ? 'Generating...'
+              : `Generate Seed Data (${enabledTables.length} table${enabledTables.length !== 1 ? 's' : ''})`}
+          </Button>
+        </div>
       </Card>
 
       {/* Preview */}

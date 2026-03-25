@@ -147,10 +147,13 @@ Többféle export formátum: Schema SQL, Migrations ZIP, Seed Data, ER Diagram P
 
 ### 4.10. Settings
 
-Felhasználói beállítások: téma (dark/light/system), alapértelmezett dialektus, migrációs formátum, nyelv, AI konfiguráció.
+Felhasználói beállítások: téma (dark/light/system), alapértelmezett dialektus, migrációs formátum, nyelv, AI konfiguráció. Az alkalmazás teljes dark és light módot támogat, amely a Settings oldalon váltható.
 
 ![Settings](screenshots/18-settings.png)
 *Settings — Appearance, Database Defaults, AI Configuration*
+
+![Dashboard Light Mode](screenshots/19-dashboard-light-mode.png)
+*Light mode — az alkalmazás teljes egészében támogatja a világos témát*
 
 ## 5. Prompt Engineering technikák és tanulságok
 
@@ -241,4 +244,4 @@ Tapasztalat: a Claude Code kiemelkedően hatékony volt a fázisonkénti fejlesz
 | Zustand store-ok | 3 (723 sor) |
 | AI funkciók | 6 (chat, analyze, migrate, seed, explain, index-analysis) |
 | Build status | Sikeres (0 hiba) |
-| Screenshot-ok | 18 |
+| Screenshot-ok | 19 (dark + light mode) |

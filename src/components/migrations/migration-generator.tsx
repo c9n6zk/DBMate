@@ -48,18 +48,20 @@ export function MigrationGenerator({
         className="min-h-16 text-sm resize-none"
         disabled={disabled || isGenerating}
       />
-      <Button
-        onClick={handleSubmit}
-        disabled={!change.trim() || isGenerating || disabled}
-        className="w-full max-w-md mx-auto"
-      >
-        {isGenerating ? (
-          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-        ) : (
-          <Sparkles className="h-4 w-4 mr-2" />
-        )}
-        {isGenerating ? 'Generating...' : 'Generate Migration'}
-      </Button>
+      <div className="flex justify-center">
+        <Button
+          onClick={handleSubmit}
+          disabled={!change.trim() || isGenerating || disabled}
+          className="w-full max-w-md"
+        >
+          {isGenerating ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Sparkles className="h-4 w-4 mr-2" />
+          )}
+          {isGenerating ? 'Generating...' : 'Generate Migration'}
+        </Button>
+      </div>
     </div>
   );
 }

@@ -210,9 +210,9 @@ export function NewProjectWizard({
         className={cn(
           'transition-all duration-200 max-h-[85vh] overflow-y-auto',
           isExtraWide
-            ? 'max-w-3xl'
+            ? 'max-w-4xl'
             : isWide
-              ? 'max-w-2xl'
+              ? 'max-w-3xl'
               : 'max-w-md'
         )}
       >
