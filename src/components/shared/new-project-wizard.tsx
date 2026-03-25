@@ -208,9 +208,9 @@ export function NewProjectWizard({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         className={cn(
-          'transition-all duration-200',
+          'transition-all duration-200 max-h-[85vh] overflow-y-auto',
           isExtraWide
-            ? 'max-w-xl'
+            ? 'max-w-3xl'
             : isWide
               ? 'max-w-2xl'
               : 'max-w-md'
@@ -239,7 +239,7 @@ export function NewProjectWizard({
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
                 placeholder="My Database"
-                className="h-9 text-sm"
+                className="h-9 text-sm max-w-xs mx-auto w-full"
                 onKeyDown={(e) => e.key === 'Enter' && goToStep2()}
                 autoFocus
               />
@@ -266,7 +266,7 @@ export function NewProjectWizard({
             <Button
               onClick={goToStep2}
               disabled={!projectName.trim()}
-              className="h-9 text-sm"
+              className="h-9 text-sm max-w-xs mx-auto w-full"
             >
               Next
               <ArrowRight className="ml-2 h-3.5 w-3.5" />
@@ -326,7 +326,7 @@ export function NewProjectWizard({
             <Button
               onClick={handleImportSQL}
               disabled={isBusy || !sql.trim()}
-              className="h-9 text-sm"
+              className="h-9 text-sm max-w-xs mx-auto w-full"
             >
               {isBusy ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -358,7 +358,7 @@ export function NewProjectWizard({
             <Button
               onClick={handleImportSQL}
               disabled={isBusy || !sql.trim()}
-              className="h-9 text-sm"
+              className="h-9 text-sm max-w-xs mx-auto w-full"
             >
               {isBusy ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -393,7 +393,7 @@ export function NewProjectWizard({
                 <Button
                   onClick={handleImportSQL}
                   disabled={isBusy || !sql.trim()}
-                  className="h-9 text-sm"
+                  className="h-9 text-sm max-w-xs mx-auto w-full"
                 >
                   {isBusy ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

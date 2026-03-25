@@ -166,7 +166,7 @@ export default function SeedPage() {
         <Button
           onClick={handleGenerate}
           disabled={isGenerating || enabledTables.length === 0}
-          className="w-full"
+          className="w-full max-w-md mx-auto"
         >
           {isGenerating ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
