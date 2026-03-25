@@ -257,7 +257,7 @@ pnpm test:coverage   # lefedettség riporttal
 
 - **API route-ok** — `/api/health`, `/api/parse`, `/api/analyze`, `/api/schemas`, `/api/settings`, `/api/chat`
 - **Felhasználói flow-k** — import flow (template → parse → dashboard), sidebar navigáció, dashboard ER diagram, optimizer elemzés, migrations generálás, export letöltés, settings mentés, chat küldés, séma verziók
-- **Akadálymentesség (a11y)** — axe-core WCAG 2 AA szabvány ellenőrzés minden fő oldalon
+- **Akadálymentesség (a11y — accessibility)** — axe-core WCAG 2 AA szabvány ellenőrzés minden fő oldalon (kontrasztarány, aria labelek, billentyűzet navigáció)
 
 ```bash
 pnpm test:e2e        # Playwright futtatás
@@ -293,6 +293,10 @@ Ezzel szemben a **lib modulok 97.87%-os lefedettséget** értek el, mert ezek az
 | Coverage | Statements | Branches | Functions | Lines |
 |---|---|---|---|---|
 | **Lib modulok** | 96.93% | 85.59% | 98.44% | **97.87%** |
+| Components/shared | 67.48% | 74.21% | 70.76% | 66.66% |
+| Components/optimizer | 45.60% | 49.26% | 50.79% | 44.65% |
+| Components/seed | 55.31% | 50.00% | 42.85% | 57.50% |
+| Components/chat | 31.15% | 27.90% | 60.71% | 27.86% |
 | **Összesen** | 60.17% | 56.59% | 54.16% | **60.59%** |
 
 ## 7. Összefoglaló
