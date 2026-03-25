@@ -14,7 +14,7 @@ Egy LLM-alapú adatbázis-asszisztens webalkalmazás fejlesztése, amely képes 
 
 ## 2. A megoldás körülményei
 
-A fejlesztés teljes egészében **Claude Code** (Anthropic CLI) segítségével történt, prompt engineering technikákat alkalmazva a tervezéstől a kódgenerálásig. A projekt ~124 TypeScript/TSX forrásfájlból áll, amelyeket fázisonként, iteratívan készítettem el.
+A fejlesztés teljes egészében **Claude Code** (Anthropic CLI) segítségével történt, prompt engineering technikákat alkalmazva a tervezéstől a kódgenerálásig. A projekt ~100 TypeScript/TSX forrásfájlból áll, amelyeket fázisonként, iteratívan készítettem el.
 
 A fejlesztési folyamat három fő lépésre tagolódott:
 
@@ -22,7 +22,7 @@ A fejlesztési folyamat három fő lépésre tagolódott:
 
 2. **Fázisonkénti implementáció** — 6 fejlesztési fázisban készült el a teljes alkalmazás (Import → Dashboard → Optimizer → Migrations → Seed → Export), minden fázisban a korábbi kód kontextusára építve. Az AI-modell konzisztens kódot generált, mert a Master Plan állandó referenciát biztosított.
 
-3. **AI Improvement Plan** — Egy önálló review ciklus, ahol az AI saját kódját elemezte és 35 javítási pontot azonosított (v6-ig iterálva). Ezek közül a kritikusakat implementáltuk: centralizált JSON parsing (`extractJSON`), retry+Zod validáció, few-shot prompting, hibrid statikus+AI elemzés.
+3. **AI Improvement Plan** — Egy önálló review ciklus, ahol az AI saját kódját elemezte és 52 javítási pontot azonosított (v6-ig iterálva). Ezek közül a kritikusakat implementáltuk: centralizált JSON parsing (`extractJSON`), retry+Zod validáció, few-shot prompting, hibrid statikus+AI elemzés.
 
 ### API elérés: Claude Max proxy vs. API kulcs
 
@@ -32,7 +32,7 @@ Ez komoly kihívást jelentett, mert a proxy **nem támogatja az Anthropic `tool
 
 Ennek megoldására **kettős stratégiát** dolgoztunk ki:
 - **Proxy mód** (Claude Max) — Az AI szöveges válaszából a `extractJSON()` függvény robusztusan kinyeri a JSON-t (markdown code block kezelés, csonkolt JSON javítás, brace-balancing), majd Zod sémával validáljuk.
-- **Közvetlen API mód** (Anthropic API kulcs) — Ha a felhasználónak van API kulcsa, a natív `tool_use` API-t használjuk structured output-tal.
+- **Közvetlen API mód** (Anthropic API kulcs) — Ha a felhasználónak van API kulcsa, az Anthropic SDK közvetlenül csatlakozik a hivatalos API-hoz (nincs proxy köztes réteg). Az output parsing azonos (`extractJSON` + Zod), de nincs szükség a proxy szerver futtatására.
 
 A mód automatikus detekciója az `isProxyMode()` függvénnyel történik (ellenőrzi, hogy az `ANTHROPIC_BASE_URL` környezeti változó be van-e állítva).
 
@@ -191,7 +191,7 @@ Az `withRetry()` függvény (`src/lib/ai-retry.ts`) egy általános retry wrappe
 
 Ez a „self-correcting" minta a legmegbízhatóbb módszer volt: az AI tipikusan a 2. próbálkozásra javítja a hibát, mert látja a konkrét Zod hibaüzenetet. Maximum 3 próbálkozás (1 + 2 retry) történik.
 
-Érdekesség: a `normalizeKeys()` logika a migrate endpointban — az AI néha `up_sql`-t ad `upSQL` helyett, ezért explicit key-mapping-et alkalmazunk a validáció előtt.
+Érdekesség: a migrate endpointban inline key-normalizálást alkalmazunk — az AI néha `up_sql`-t ad `upSQL` helyett, ezért a Zod validáció előtt explicit mappinggel javítjuk a kulcsneveket (pl. `if ('up_sql' in json) json.upSQL = json.up_sql`).
 
 ### 5.4. Claude Code CLI mint fejlesztési eszköz
 
@@ -231,8 +231,8 @@ Tapasztalat: a Claude Code kiemelkedően hatékony volt a fázisonkénti fejlesz
 
 | Metrika | Érték |
 |---|---|
-| Forrásfájlok | 124 TypeScript/TSX |
-| API végpontok | 14 |
+| Forrásfájlok | ~100 TypeScript/TSX |
+| API végpontok | 15 |
 | UI komponensek | 60+ |
 | Oldalak/route-ok | 7 + error/loading |
 | AI funkciók | 6 (chat, analyze, migrate, seed, explain, index-analysis) |
